@@ -12,6 +12,12 @@
     button:hover { background-color: #0056b3; }
     #pinyinOutput { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9; min-height: 50px; border-radius: 4px; line-height: 1.6; }
     .options { margin-bottom: 15px; }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -29,7 +35,11 @@
     <label for="usePolyphoneDictCheckbox">多音字辞書を使用する (精度が向上しますが、処理が遅くなる場合があります)</label>
   </div>
 
-  <button id="convertButton">ピンインに変換</button>
+  <div class="button-group">
+    <button id="convertButton">ピンインに変換</button>
+    <button id="clearButton">クリア</button>
+    <button id="copyButton">結果をコピー</button>
+  </div>
 
   <h2>変換結果:</h2>
   <div id="pinyinOutput"></div>
@@ -46,6 +56,8 @@
   const doPolyphoneCheckbox = document.getElementById('doPolyphoneCheckbox');
   const usePolyphoneDictCheckbox = document.getElementById('usePolyphoneDictCheckbox');
   const convertButton = document.getElementById('convertButton');
+  const clearButton = document.getElementById('clearButton');
+  const copyButton = document.getElementById('copyButton');
   const pinyinOutputDiv = document.getElementById('pinyinOutput');
 
   // ボタンのクリックイベントリスナーを設定
@@ -81,6 +93,40 @@
       // 多音字非対応の場合、結果は文字列
       pinyinOutputDiv.innerHTML = pinyinResult;
     }
+  });
+
+  // クリアボタンのクリックイベントリスナー
+  clearButton.addEventListener('click', () => {
+    chineseTextInput.value = '';
+    doPolyphoneCheckbox.checked = false;
+    usePolyphoneDictCheckbox.checked = false;
+    pinyinOutputDiv.innerHTML = '';
+  });
+
+  // コピーボタンのクリックイベントリスナー
+  copyButton.addEventListener('click', () => {
+    const chineseText = chineseTextInput.value.trim();
+    const doPolyphone = doPolyphoneCheckbox.checked ? 'はい' : 'いいえ';
+    const usePolyphoneDict = usePolyphoneDictCheckbox.checked ? 'はい' : 'いいえ';
+    const pinyinResult = pinyinOutputDiv.innerText; // innerTextで改行を保持したテキストを取得
+
+    const textToCopy = `中国語文章:\n${chineseText}\n\n` +
+                       `オプション:\n` +
+                       `  - 多音字対応する: ${doPolyphone}\n` +
+                       `  - 多音字辞書を使用する: ${usePolyphoneDict}\n\n` +
+                       `変換結果:\n${pinyinResult}`;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      // コピー成功時のフィードバック
+      const originalText = copyButton.textContent;
+      copyButton.textContent = 'コピーしました！';
+      setTimeout(() => {
+        copyButton.textContent = originalText;
+      }, 2000); // 2秒後に元に戻す
+    }).catch(err => {
+      console.error('クリップボードへのコピーに失敗しました: ', err);
+      alert('コピーに失敗しました。');
+    });
   });
 </script>
   
