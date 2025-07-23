@@ -337,6 +337,7 @@
 					{
 						if(res[k]) result[i+k] = withtone ? res[k] : pinyinUtil.removeTone(res[k]);
 					}
+					i += j; // マッチした単語の分だけインデックスを進める
 					break;
 				}
 			}
